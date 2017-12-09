@@ -1,7 +1,7 @@
 {
-  "name": "Roomate",
-  "description": "Enter or create rooms, add or listen to posts!",
+  "name": "roomate-alexa",
   "version": "0.0.1",
+  "description": "DialogFlow + Amazon Alexa",
   "author": "Garren Steigers",
   "engines": {
     "node": ">=4.0.0"
@@ -11,8 +11,8 @@
     "url": "git+https://github.com/mrgarrenteed/roomate.git"
   },
   "keywords": [
+    "alexa",
     "api.ai",
-    "dialogflow",
     "nlu",
     "nlp",
     "chatbots",
@@ -21,10 +21,7 @@
     "awesomeness"
   ],
   "dependencies": {
-    "actions-on-google": "^1.5.x",
-    "apiai": "^4.0.3",
-    "firebase-admin": "^5.5.1",
-    "firebase-functions": "^0.7.0"
-  },
-  "private": true
+    "alexa-sdk": "^1.0.20",
+    "apiai": "^4.0.3"
+  }
 }
