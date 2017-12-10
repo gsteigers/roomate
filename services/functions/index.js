@@ -59,6 +59,10 @@ function processV1Request (request, response) {
   
     // Create handlers for Dialogflow actions as well as a 'default' handler
     const actionHandlers = {
+      'pick.room': (context) => {
+        console.log("Before calling checkRoom - context: " + context);
+        pickRoomHandler(context);
+      },
       'check.password': (context) => {
         console.log("Before calling checkPassword - context: " + context);
         checkPasswordHandler(context);
@@ -72,6 +76,7 @@ function processV1Request (request, response) {
         getRecentPostHandler(context);
       },
       'default': (context) => { // Default handler for unknown or undefined actions
+        console.log("Fall to default - action: " + action);
         if (requestSource === googleRequest) {
           let responseToUser = {
             //googleRichResponse: googleRichResponse, // Optional, uncomment to enable
@@ -101,6 +106,24 @@ function processV1Request (request, response) {
     actionHandlers[action](inputContexts);
 
     //Helpers
+    function checkRoom(room, callback) {
+        console.log("rooms/" + room);
+        var roomsRef = firebase.database().ref('rooms/' + room);
+        roomsRef.once('value', function(snapshot) {
+            console.log("I have received a snapshot: " + snapshot + " - " + JSON.stringify(snapshot));
+            if(snapshot !== undefined) {
+                var value = snapshot.val();
+                console.log("snapshot value = " + value + " - " + JSON.stringify(value));
+                if(value !== null) {
+                    callback({room: room, isRoom: true});
+                } else {
+                    callback({room: room, isRoom: false});
+                }
+                
+            }
+        });
+    }
+
     function checkRoomPassword(room, password, user, callback) {
         console.log("rooms/" + room);
         var roomsRef = firebase.database().ref('rooms/' + room);
@@ -179,6 +202,41 @@ function processV1Request (request, response) {
         // } else {
         //     sendGoogleResponse({speech: saying + ". What would you like to do next?"});
         // }
+    }
+
+    function pickRoomHandler(context) {
+        console.log("checkPasswordHandler called");
+        console.log("Context: " + context);
+        let room = context.parameters.room;
+
+        console.log("Room: " + room);
+
+        let onCheck = function(response) {
+            console.log("checkRoom - callback");
+            let msg = "";
+            if(response.isRoom) {
+                msg = "You are trying to enter " + response.room + "! What is the password?";
+            } else {
+                msg = "The room " + response.room + " does not exist. Try a different room or try creating a new room";
+            }
+
+            console.log("msg: " + msg);
+            sendResponse(msg);
+            // if(requestSource === "slack") {
+            //     sendResponse(saying + ". What would you like to do next?");
+            // } else {
+            //     sendGoogleResponse({speech: saying + ". What would you like to do next?"});
+            // }
+        }
+
+        let saying = "";
+        if(room === null) {
+            saying += "The room is undefined. Please specify a room.";
+            console.log(saying);
+            app.ask(saying);
+        } else {
+            checkRoom(room, onCheck);
+        }
     }
 
     function checkPasswordHandler(context) {

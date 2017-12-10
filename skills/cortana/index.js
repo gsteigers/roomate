@@ -3,7 +3,7 @@ const DialogFlowSdk = require('apiai');
 const restify = require('restify');
 const builder = require('botbuilder');
 
-const DIALOGFLOW_DEV_ACCESS_TOKEN = '<YOUR_ACCESS_TOKEN';
+const DIALOGFLOW_DEV_ACCESS_TOKEN = '<YOUR_ACCESS_TOKEN>';
 
 const DialogFlow = new DialogFlowSdk(DIALOGFLOW_DEV_ACCESS_TOKEN);
 
